@@ -7,7 +7,7 @@ function App() {
     <Layout>
       {/* Hero */}
       <div className="cxa-hero">
-        <div className="cxa-hero-badge">⬡ AI-Powered Trading</div>
+        <div className="cxa-hero-badge">AI-Powered Trading</div>
         <h1 className="cxa-hero-title">
           The Future of <br />
           <span className="cxa-gradient-text">Autonomous Trading</span>

@@ -1,0 +1,153 @@
+/* ============================================================
+   DashboardPage – layout & panel styles
+   ============================================================ */
+
+/* ── Page shell ──────────────────────────────────────────── */
+.dash-page {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    padding-bottom: 60px;
+}
+
+/* ── Page header ─────────────────────────────────────────── */
+/* .dash-header {
+    display: flex;
+    align-items: center;
+    margin: auto;
+    gap: 16px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+} */
+
+/* .dash-header-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.dash-live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.8);
+    animation: dash-pulse 2s ease-in-out infinite;
+} */
+
+@keyframes dash-pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.5;
+        transform: scale(0.8);
+    }
+}
+
+.dash-live-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: #22c55e;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.dash-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 800;
+    color: #f0ede8;
+    line-height: 1;
+    letter-spacing: -0.3px;
+    margin-bottom: 4px;
+}
+
+.dash-sub {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.83rem;
+    color: #666;
+    line-height: 1.5;
+}
+
+/* ── Rows ────────────────────────────────────────────────── */
+.dash-row {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Side-by-side split: ~38% left  62% right */
+.dash-row--split {
+    display: grid;
+    grid-template-columns: 38fr 62fr;
+    gap: 24px;
+    align-items: start;
+}
+
+/* ── Panel card ──────────────────────────────────────────── */
+.dash-panel {
+    background: #111111;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: border-color 0.22s ease, box-shadow 0.22s ease;
+}
+
+.dash-panel:hover {
+    border-color: rgba(249, 115, 22, 0.2);
+    box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.1),
+        0 12px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* ── Panel header strip ──────────────────────────────────── */
+.dash-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.015);
+}
+
+.dash-panel-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #f97316;
+    box-shadow: 0 0 6px rgba(249, 115, 22, 0.7);
+    flex-shrink: 0;
+}
+
+.dash-panel-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: rgba(240, 237, 232, 0.75);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 960px) {
+    .dash-row--split {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .dash-page {
+        gap: 20px;
+    }
+
+    .dash-header {
+        padding-bottom: 16px;
+        gap: 12px;
+    }
+}

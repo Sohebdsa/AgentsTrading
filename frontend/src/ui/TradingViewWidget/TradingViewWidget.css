@@ -1,0 +1,74 @@
+/* ============================================================
+   TradingViewWidget – scoped styles (matches CubeXAgents theme)
+   ============================================================ */
+
+/* ── Wrapper ──────────────────────────────────────────────── */
+.tv-widget-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Optional title above the card ───────────────────────── */
+.tv-widget-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text, #f0ede8);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding-left: 2px;
+}
+
+/* ── Card shell ──────────────────────────────────────────── */
+.tv-widget-card {
+  background: var(--surface, #111111);
+  border: 1px solid var(--border, rgba(255,255,255,0.06));
+  border-radius: 12px;
+  overflow: hidden;
+
+  /* subtle orange top edge */
+  box-shadow:
+    0 0 0 1px rgba(249,115,22,0.08),
+    inset 0 1px 0 rgba(249,115,22,0.12);
+
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tv-widget-card:hover {
+  border-color: rgba(249, 115, 22, 0.22);
+  box-shadow:
+    0 0 0 1px rgba(249,115,22,0.15),
+    0 8px 32px rgba(249,115,22,0.06),
+    inset 0 1px 0 rgba(249,115,22,0.15);
+}
+
+/* ── Copyright strip ─────────────────────────────────────── */
+.tradingview-widget-copyright {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  padding: 0 14px;
+  background: rgba(0, 0, 0, 0.35);
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.tv-copyright-link {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--orange, #f97316);
+  text-decoration: none;
+  letter-spacing: 0.02em;
+}
+
+.tradingview-widget-copyright a:hover .tv-copyright-link {
+  text-decoration: underline;
+}
+
+.tv-copyright-trademark {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.28);
+}
