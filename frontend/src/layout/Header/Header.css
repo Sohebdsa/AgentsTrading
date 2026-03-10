@@ -1,0 +1,341 @@
+/* ========================================
+   CubeXAgents – Header (Black & Orange)
+   ======================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&display=swap');
+
+:root {
+    --h-bg: #0a0a0a;
+    --h-border: rgba(255, 255, 255, 0.06);
+    --h-orange: #f97316;
+    --h-orange-dim: rgba(249, 115, 22, 0.12);
+    --h-orange-glow: rgba(249, 115, 22, 0.25);
+    --h-text: #f0ede8;
+    --h-muted: #6b6b6b;
+    --h-surface: rgba(255, 255, 255, 0.03);
+    --h-radius: 8px;
+    --h-height: 64px;
+    --ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Sticky bar ───────────────────────────── */
+.cxa-header {
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    background: rgba(10, 10, 10, 0.88);
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    border-bottom: 1px solid var(--h-border);
+}
+
+.cxa-header-inner {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 28px;
+    height: var(--h-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+/* ── Logo ─────────────────────────────────── */
+.cxa-logo {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.cxa-logo-cube {
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--h-orange);
+}
+
+.cxa-logo-text {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: var(--h-text);
+    letter-spacing: -0.3px;
+}
+
+.cxa-logo-accent {
+    color: var(--h-orange);
+}
+
+/* ── Desktop nav ──────────────────────────── */
+.cxa-nav {
+    display: flex;
+}
+
+.cxa-nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+/* ── Nav link base ────────────────────────── */
+.cxa-nav-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 13px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--h-muted);
+    text-decoration: none;
+    border: none;
+    background: transparent;
+    border-radius: var(--h-radius);
+    cursor: pointer;
+    transition: color 0.18s var(--ease), background 0.18s var(--ease);
+    white-space: nowrap;
+}
+
+.cxa-nav-link:hover,
+.cxa-nav-link.active {
+    color: var(--h-text);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* thin underline on hover */
+.cxa-nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 3px;
+    left: 13px;
+    right: 13px;
+    height: 1.5px;
+    background: var(--h-orange);
+    border-radius: 1px;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.2s var(--ease);
+}
+
+.cxa-nav-link:hover::after,
+.cxa-nav-link.active::after {
+    transform: scaleX(1);
+}
+
+/* ── Login button ─────────────────────────── */
+.cxa-login-btn {
+    padding: 7px 16px;
+    color: var(--h-orange);
+    border: 1px solid rgba(249, 115, 22, 0.4);
+    border-radius: var(--h-radius);
+    background: var(--h-orange-dim);
+    font-weight: 600;
+    transition: background 0.18s var(--ease), box-shadow 0.18s var(--ease), color 0.18s var(--ease);
+}
+
+.cxa-login-btn::after {
+    display: none;
+}
+
+.cxa-login-btn:hover {
+    background: rgba(249, 115, 22, 0.2);
+    box-shadow: 0 0 14px var(--h-orange-glow);
+    color: #fff;
+}
+
+/* ── Chevron ──────────────────────────────── */
+.cxa-chevron {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+    transition: transform 0.18s var(--ease);
+}
+
+.cxa-chevron.up {
+    transform: rotate(180deg);
+}
+
+/* ── Dropdown wrapper ─────────────────────── */
+.cxa-nav-dropdown-wrapper {
+    position: relative;
+}
+
+/* ── Dropdown menu ────────────────────────── */
+.cxa-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 190px;
+    background: #111111;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 10px;
+    padding: 5px;
+    list-style: none;
+    margin: 0;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(6px);
+    transform-origin: top right;
+    transition: opacity 0.18s var(--ease), transform 0.18s var(--ease), visibility 0.18s var(--ease);
+    z-index: 300;
+}
+
+.cxa-dropdown.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* small orange strip on left of dropdown */
+.cxa-dropdown::before {
+    content: '';
+    position: absolute;
+    top: 12px;
+    left: -1px;
+    width: 2px;
+    height: 30px;
+    background: var(--h-orange);
+    border-radius: 2px;
+}
+
+.cxa-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.845rem;
+    font-weight: 500;
+    color: var(--h-muted);
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s;
+}
+
+.cxa-dropdown-item:hover {
+    background: rgba(249, 115, 22, 0.09);
+    color: var(--h-text);
+}
+
+/* ── Hamburger ────────────────────────────── */
+.cxa-hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 36px;
+    height: 36px;
+    padding: 7px;
+    background: transparent;
+    border: 1px solid var(--h-border);
+    border-radius: var(--h-radius);
+    cursor: pointer;
+}
+
+.cxa-hamburger span {
+    display: block;
+    width: 18px;
+    height: 1.5px;
+    background: var(--h-text);
+    border-radius: 2px;
+    transition: transform 0.2s var(--ease), opacity 0.2s;
+    transform-origin: center;
+}
+
+.cxa-hamburger.open span:nth-child(1) {
+    transform: translateY(6.5px) rotate(45deg);
+}
+
+.cxa-hamburger.open span:nth-child(2) {
+    opacity: 0;
+}
+
+.cxa-hamburger.open span:nth-child(3) {
+    transform: translateY(-6.5px) rotate(-45deg);
+}
+
+/* ── Mobile drawer ────────────────────────── */
+.cxa-mobile-nav {
+    display: none;
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.32s var(--ease);
+    border-top: 1px solid var(--h-border);
+    background: #0a0a0a;
+}
+
+.cxa-mobile-nav.open {
+    max-height: 380px;
+}
+
+/* mobile list */
+.cxa-nav-list.mobile {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    padding: 10px 14px 16px;
+}
+
+.cxa-nav-list.mobile .cxa-nav-link {
+    width: 100%;
+    padding: 11px 14px;
+    font-size: 0.95rem;
+}
+
+.cxa-nav-list.mobile .cxa-nav-link::after {
+    display: none;
+}
+
+.cxa-nav-list.mobile .cxa-nav-dropdown-wrapper {
+    width: 100%;
+}
+
+.cxa-nav-list.mobile .cxa-login-btn {
+    width: 100%;
+    justify-content: space-between;
+}
+
+/* mobile dropdown sits inline */
+.cxa-nav-list.mobile .cxa-dropdown {
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    box-shadow: none;
+    background: #161616;
+    border: none;
+    border-left: 2px solid var(--h-orange);
+    border-radius: 0;
+    margin: 4px 0 4px 12px;
+    display: none;
+}
+
+.cxa-nav-list.mobile .cxa-dropdown::before {
+    display: none;
+}
+
+.cxa-nav-list.mobile .cxa-dropdown.visible {
+    display: block;
+}
+
+/* ── Breakpoints ────────────────────────────── */
+@media (max-width: 760px) {
+    .cxa-nav {
+        display: none;
+    }
+
+    .cxa-hamburger {
+        display: flex;
+    }
+
+    .cxa-mobile-nav {
+        display: block;
+    }
+}

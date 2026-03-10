@@ -1,0 +1,96 @@
+/* ── Reusable Button Component ─────────────── */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.18s, box-shadow 0.18s, transform 0.18s, color 0.18s, border-color 0.18s;
+    white-space: nowrap;
+    letter-spacing: 0.01em;
+}
+
+/* ── Sizes ─────────────────────────────────── */
+.btn--sm {
+    padding: 8px 16px;
+    font-size: 0.8rem;
+}
+
+.btn--md {
+    padding: 12px 24px;
+    font-size: 0.9rem;
+}
+
+.btn--lg {
+    padding: 15px 32px;
+    font-size: 1rem;
+}
+
+/* ── Variants ──────────────────────────────── */
+
+/* Primary — solid orange */
+.btn--primary {
+    background: #f97316;
+    color: #000;
+}
+
+.btn--primary:hover {
+    background: #fb923c;
+    box-shadow: 0 6px 20px rgba(249, 115, 22, 0.3);
+    transform: translateY(-1px);
+}
+
+.btn--primary:active {
+    transform: translateY(0);
+}
+
+/* Ghost — transparent with border */
+.btn--ghost {
+    background: transparent;
+    color: #6b6b6b;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.btn--ghost:hover {
+    border-color: rgba(249, 115, 22, 0.35);
+    color: #f0ede8;
+}
+
+/* Outline orange */
+.btn--outline {
+    background: rgba(249, 115, 22, 0.10);
+    color: #f97316;
+    border: 1px solid rgba(249, 115, 22, 0.35);
+}
+
+.btn--outline:hover {
+    background: rgba(249, 115, 22, 0.18);
+    box-shadow: 0 0 14px rgba(249, 115, 22, 0.2);
+    color: #fff;
+}
+
+/* Danger */
+.btn--danger {
+    background: rgba(239, 68, 68, 0.12);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.btn--danger:hover {
+    background: rgba(239, 68, 68, 0.22);
+    color: #fff;
+}
+
+/* Disabled state */
+.btn:disabled,
+.btn[aria-disabled='true'] {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}

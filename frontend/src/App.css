@@ -1,0 +1,219 @@
+/* ========================================
+   CubeXAgents – App & Page (Black/Orange)
+   ======================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&display=swap');
+
+:root {
+  --orange: #f97316;
+  --orange-dim: rgba(249, 115, 22, 0.12);
+  --orange-glow: rgba(249, 115, 22, 0.22);
+  --bg: #080808;
+  --surface: #111111;
+  --border: rgba(255, 255, 255, 0.06);
+  --text: #f0ede8;
+  --muted: #666;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+.cxa-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  /* very subtle radial warm glow at top */
+  background:
+    radial-gradient(ellipse 70% 35% at 50% 0%, rgba(249, 115, 22, 0.07) 0%, transparent 60%),
+    #080808;
+}
+
+/* ── Main content ──────────────────────── */
+.cxa-main {
+  flex: 1;
+  max-width: 1180px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 90px 28px 60px;
+}
+
+/* ── Hero ─────────────────────────────── */
+.cxa-hero {
+  text-align: center;
+  padding-bottom: 80px;
+}
+
+.cxa-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 14px;
+  background: var(--orange-dim);
+  border: 1px solid rgba(249, 115, 22, 0.28);
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--orange);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 28px;
+}
+
+.cxa-hero-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -1px;
+  color: var(--text);
+  margin-bottom: 22px;
+}
+
+.cxa-gradient-text {
+  /* orange to white gradient */
+  background: linear-gradient(90deg, var(--orange) 0%, #fbbf24 60%, #fff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.cxa-hero-sub {
+  font-size: 1rem;
+  color: var(--muted);
+  line-height: 1.75;
+  max-width: 500px;
+  margin: 0 auto 40px;
+}
+
+.cxa-hero-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Solid orange CTA */
+.cxa-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 28px;
+  background: var(--orange);
+  color: #000;
+  font-size: 0.9rem;
+  font-weight: 700;
+  border-radius: 6px;
+  text-decoration: none;
+  letter-spacing: 0.01em;
+  transition: background 0.18s, box-shadow 0.18s, transform 0.18s;
+}
+
+.cxa-btn-primary:hover {
+  background: #fb923c;
+  box-shadow: 0 6px 24px var(--orange-glow);
+  transform: translateY(-1px);
+}
+
+/* Ghost secondary */
+.cxa-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  padding: 13px 28px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 6px;
+  text-decoration: none;
+  background: transparent;
+  transition: border-color 0.18s, color 0.18s;
+}
+
+.cxa-btn-ghost:hover {
+  border-color: rgba(249, 115, 22, 0.35);
+  color: var(--text);
+}
+
+/* ── Stats strip ──────────────────────── */
+.cxa-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.cxa-stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 22px 22px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.cxa-stat-card:hover {
+  border-color: rgba(249, 115, 22, 0.25);
+  transform: translateY(-2px);
+}
+
+/* orange top line */
+.cxa-stat-card::before {
+  content: '';
+  display: block;
+  width: 28px;
+  height: 2px;
+  background: var(--orange);
+  border-radius: 2px;
+  margin-bottom: 14px;
+}
+
+.cxa-stat-value {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.cxa-stat-label {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 5px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+/* ── Responsive ─────────────────────────── */
+@media (max-width: 768px) {
+  .cxa-main {
+    padding: 56px 18px 48px;
+  }
+
+  .cxa-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .cxa-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .cxa-hero-title {
+    letter-spacing: -0.5px;
+  }
+}
