@@ -41,6 +41,8 @@ const signalColor: Record<string, string> = {
   BUY: '#2ecc71', SELL: '#e74c3c', WAIT: '#f1c40f', AVOID: '#e67e22', 'NO TRADE': '#f1c40f',
 };
 
+const signalClass = (s: string) => s?.replace(' ', '-') ?? '';
+
 export default function AgentsPage() {
   const [symbol, setSymbol] = useState('BTCUSDT');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -50,9 +52,9 @@ export default function AgentsPage() {
   // Individual agent reports (for node click details)
   const [agentReports, setAgentReports] = useState<Record<string, AgentReport>>({});
 
-  // Ticker-style log: a queue of strings
-  const [logQueue, setLogQueue] = useState<string[]>([]);
+  // Ticker-style log: a queue of strings (drained via ref, no re-renders needed)
   const [tickerMsg, setTickerMsg] = useState<string>('');
+
   const [tickerVisible, setTickerVisible] = useState(false);
 
   // Decision summary
@@ -251,9 +253,9 @@ export default function AgentsPage() {
                     <h3><div className="status-indicator" /> {nodeLabel[n]}</h3>
                     {r && (
                       <div className="node-result">
-                        <span className="node-signal" style={{ color: signalColor[r.signal] ?? '#fff' }}>{r.signal}</span>
-                        <span className="node-conf">{Math.round(r.confidence * 100)}%</span>
-                        <span className="node-view-hint">Click to view →</span>
+                        <span className={`node-signal ${r.signal}`}>{r.signal}</span>
+                        <span className="node-conf">{Math.round(r.confidence * 100)}% conf</span>
+                        <span className="node-view-hint">view</span>
                       </div>
                     )}
                   </div>
@@ -265,7 +267,7 @@ export default function AgentsPage() {
             <div className={`decision-node ${nodeStatus.DecisionAgent} ${decisionData ? 'clickable' : ''}`}
               onClick={() => decisionData && setSidePanelMode('decision')}>
               <h3>Final Aggregation Agent{decisionData && <span className="node-view-hint" style={{ marginLeft: 8 }}>View →</span>}</h3>
-              <div className="decision-result" style={{ color: decisionData ? (signalColor[decisionData.final_decision] ?? '#fff') : '#888' }}>
+              <div className={`decision-result ${signalClass(decisionData?.final_decision ?? '')}`}>
                 {decisionData?.final_decision ?? 'PENDING'}
               </div>
             </div>
@@ -279,7 +281,7 @@ export default function AgentsPage() {
               <>
                 <div className="side-panel-title">{selected.label}</div>
                 <div className="side-panel-signal-row">
-                  <span className="sp-signal" style={{ color: signalColor[selected.signal] ?? '#fff' }}>{selected.signal}</span>
+              <div className={`sp-signal ${signalClass(selected.signal)}`}>{selected.signal}</div>
                   <span className="sp-conf">{Math.round(selected.confidence * 100)}% confidence</span>
                 </div>
                 <div className="sp-section-title">Reasoning</div>
@@ -300,7 +302,7 @@ export default function AgentsPage() {
             {sidePanelMode === 'decision' && (
               <>
                 <div className="side-panel-title">Final Decision</div>
-                <div className="sp-final-decision" style={{ color: decisionData ? (signalColor[decisionData.final_decision] ?? '#fff') : '#888' }}>
+                <div className={`sp-final-decision ${signalClass(decisionData?.final_decision ?? '')}`}>
                   {decisionData?.final_decision ?? '—'}
                 </div>
                 {decisionData?.details && (
