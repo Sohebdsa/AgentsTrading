@@ -3,17 +3,32 @@ import Layout from '../../layout/Layout';
 import TradingViewWidget from '../../ui/TradingViewWidget/TradingViewWidget';
 import './AgentsPage.css';
 
-interface ChatMessage {
-  id: string;
-  author: string;
-  text: string;
-  type?: 'system' | 'agent';
-}
-
 type NodeStatus = 'idle' | 'active' | 'completed';
 
-const AGENT_NODES = ['MarketData', 'TechnicalAgent', 'SentimentAgent', 'OrderFlowAgent', 'RiskAgent', 'DecisionAgent'];
+interface AgentReport {
+  node: string;
+  label: string;
+  signal: string;
+  confidence: number;
+  reasoning: string;
+  entry?: number;
+  stop_loss?: number;
+  take_profit?: number;
+}
 
+interface DecisionData {
+  final_decision: string;
+  details?: {
+    confidence?: number;
+    score?: number;
+    reasoning_summary?: string;
+    avg_entry?: number;
+    avg_stop_loss?: number;
+    avg_take_profit?: number;
+  };
+}
+
+const NODES = ['MarketData', 'TechnicalAgent', 'SentimentAgent', 'OrderFlowAgent', 'RiskAgent', 'DecisionAgent'];
 const nodeLabel: Record<string, string> = {
   MarketData:     'Market Data',
   TechnicalAgent: 'Technical Analysis',
@@ -22,236 +37,339 @@ const nodeLabel: Record<string, string> = {
   RiskAgent:      'Risk Management',
   DecisionAgent:  'Decision Aggregation',
 };
-
 const signalColor: Record<string, string> = {
-  BUY:  '#2ecc71',
-  SELL: '#e74c3c',
-  WAIT: '#f1c40f',
-  AVOID:'#e67e22',
+  BUY: '#2ecc71', SELL: '#e74c3c', WAIT: '#f1c40f', AVOID: '#e67e22', 'NO TRADE': '#f1c40f',
 };
 
 export default function AgentsPage() {
   const [symbol, setSymbol] = useState('BTCUSDT');
   const [isProcessing, setIsProcessing] = useState(false);
   const [nodeStatus, setNodeStatus] = useState<Record<string, NodeStatus>>(() =>
-    Object.fromEntries(AGENT_NODES.map(n => [n, 'idle']))
+    Object.fromEntries(NODES.map(n => [n, 'idle']))
   );
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [decision, setDecision] = useState<string | null>(null);
+  // Individual agent reports (for node click details)
+  const [agentReports, setAgentReports] = useState<Record<string, AgentReport>>({});
+
+  // Ticker-style log: a queue of strings
+  const [logQueue, setLogQueue] = useState<string[]>([]);
+  const [tickerMsg, setTickerMsg] = useState<string>('');
+  const [tickerVisible, setTickerVisible] = useState(false);
+
+  // Decision summary
+  const [decisionData, setDecisionData] = useState<DecisionData | null>(null);
+
+  // Side panel
+  const [sidePanelMode, setSidePanelMode] = useState<'agent' | 'decision' | null>(null);
+  const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
+
+  // Approval modal
   const [showApprovalModal, setShowApprovalModal] = useState(false);
 
   const wsRef = useRef<WebSocket | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const tickerTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const logQueueRef = useRef<string[]>([]);
 
-  const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  useEffect(() => { scrollToBottom(); }, [messages]);
-
-  const addMessage = (author: string, text: string, type: 'system' | 'agent' = 'agent') => {
-    setMessages(prev => [...prev, { id: `${Date.now()}-${Math.random()}`, author, text, type }]);
+  // Ticker engine: drain queue one message at a time
+  const drainQueue = () => {
+    const q = logQueueRef.current;
+    if (q.length === 0) {
+      setTickerVisible(false);
+      return;
+    }
+    const next = q.shift()!;
+    setTickerMsg(next);
+    setTickerVisible(true);
+    tickerTimerRef.current = setTimeout(() => {
+      setTickerVisible(false);
+      setTimeout(() => drainQueue(), 400); // gap between messages
+    }, 2800);
   };
+
+  const pushLog = (msg: string) => {
+    logQueueRef.current.push(msg);
+    if (!tickerTimerRef.current || logQueueRef.current.length === 1) {
+      drainQueue();
+    }
+  };
+
+  useEffect(() => {
+    return () => { if (tickerTimerRef.current) clearTimeout(tickerTimerRef.current); };
+  }, []);
 
   const setNode = (node: string, status: NodeStatus) =>
     setNodeStatus(prev => ({ ...prev, [node]: status }));
 
+  const resetAll = () => {
+    setNodeStatus(Object.fromEntries(NODES.map(n => [n, 'idle'])));
+    setAgentReports({});
+    setDecisionData(null);
+    setSidePanelMode(null);
+    setSelectedAgent(null);
+    logQueueRef.current = [];
+    if (tickerTimerRef.current) clearTimeout(tickerTimerRef.current);
+    setTickerVisible(false);
+  };
+
   const startAnalysis = () => {
     wsRef.current?.close();
-
+    resetAll();
     setIsProcessing(true);
-    setDecision(null);
-    setShowApprovalModal(false);
-    setNodeStatus(Object.fromEntries(AGENT_NODES.map(n => [n, 'idle'])));
-    setMessages([]);
-    addMessage('System', `Initializing analysis pipeline for ${symbol}…`, 'system');
+    pushLog(`Initializing pipeline for ${symbol}…`);
 
-    // Use the symbol as passed (no slash replacement needed for WS path)
-    const wsSymbol = symbol.replace('/', '_');
-    const ws = new WebSocket(`ws://localhost:8000/api/v1/ws/signals/${wsSymbol}`);
+    const ws = new WebSocket(`ws://localhost:8000/api/v1/ws/signals/${symbol.replace('/', '_')}`);
     wsRef.current = ws;
 
-    ws.onopen = () => console.log('[WS] Connected to AI Agents server');
-    ws.onerror = () => {
-      addMessage('System', '❌ Cannot connect to backend. Is uvicorn running on port 8000?', 'system');
-      setIsProcessing(false);
-    };
+    ws.onerror = () => { pushLog('❌ Cannot connect to backend (port 8000).'); setIsProcessing(false); };
     ws.onclose = (e) => {
-      if (e.code !== 1000 && e.code !== 1005) {
-        addMessage('System', `⚠️ Connection closed unexpectedly (code ${e.code}). Check backend logs.`, 'system');
-      }
+      if (e.code !== 1000 && e.code !== 1005) pushLog(`⚠️ Connection closed (code ${e.code}).`);
       setIsProcessing(false);
     };
 
     ws.onmessage = (event) => {
       try {
-        const msg = JSON.parse(event.data) as { type: string; node?: string; data?: any; decision?: string; message?: string };
+        const msg = JSON.parse(event.data) as { type: string; node?: string; data?: any; decision?: any; message?: string };
 
         if (msg.type === 'node_start') {
           setNode(msg.node!, 'active');
-          if (msg.node !== 'MarketData' && msg.node !== 'DecisionAgent') {
-            addMessage('System', `${nodeLabel[msg.node!]} agent is analyzing…`, 'system');
-          } else if (msg.node === 'DecisionAgent') {
-            addMessage('System', 'Decision Agent synthesizing all reports…', 'system');
-          }
+          if (msg.node === 'DecisionAgent') pushLog('Decision Agent synthesizing all reports…');
+          else if (msg.node !== 'MarketData') pushLog(`${nodeLabel[msg.node!]} analyzing…`);
 
         } else if (msg.type === 'node_complete') {
           setNode(msg.node!, 'completed');
           const d = msg.data ?? {};
           if (msg.node === 'MarketData') {
-            addMessage('System', d.message ?? 'Market data fetched.', 'system');
+            pushLog('✅ Live market data fetched successfully.');
           } else {
-            // Analysis agent completed
             const sig = d.signal ?? 'WAIT';
             const conf = d.confidence ? `${Math.round(d.confidence * 100)}%` : 'N/A';
-            const entry = d.entry ? ` | Entry: $${d.entry}` : '';
-            const sl = d.stop_loss ? ` | SL: $${d.stop_loss}` : '';
-            const tp = d.take_profit ? ` | TP: $${d.take_profit}` : '';
-            addMessage(
-              `${d.agent_name ?? msg.node} Agent`,
-              `[${sig}] (${conf} confidence) — ${d.reasoning ?? ''}${entry}${sl}${tp}`
-            );
+            const report: AgentReport = {
+              node: msg.node!,
+              label: nodeLabel[msg.node!],
+              signal: sig,
+              confidence: d.confidence ?? 0,
+              reasoning: d.reasoning ?? 'No reasoning provided.',
+              entry: d.entry,
+              stop_loss: d.stop_loss,
+              take_profit: d.take_profit,
+            };
+            setAgentReports(prev => ({ ...prev, [msg.node!]: report }));
+            pushLog(`${report.label}: ${sig} (${conf} confidence)`);
           }
 
         } else if (msg.type === 'decision') {
           setNode('DecisionAgent', 'completed');
-          const finalDecision = msg.data?.final_decision ?? 'N/A';
-          const details = msg.data?.details;
-          setDecision(finalDecision);
-          const detailStr = details
-            ? ` | Confidence: ${Math.round((details.confidence ?? 0) * 100)}%, Score: ${(details.score ?? 0).toFixed(2)}`
-            : '';
-          addMessage('Decision Aggregator', `Final verdict: ${finalDecision}${detailStr}${details?.reasoning_summary ? ` — ${details.reasoning_summary}` : ''}`);
+          const d: DecisionData = {
+            final_decision: msg.data?.final_decision ?? 'N/A',
+            details: msg.data?.details,
+          };
+          setDecisionData(d);
+          pushLog(`🏁 Final Decision: ${d.final_decision}`);
+          // Auto-open decision panel
+          setTimeout(() => setSidePanelMode('decision'), 600);
 
         } else if (msg.type === 'paused') {
-          addMessage('System', '⏸ Pipeline paused — awaiting human approval.', 'system');
-          if (msg.decision) setDecision(msg.decision);
+          pushLog('⏸ Pipeline paused — awaiting human approval.');
+          if (msg.decision) setDecisionData({ final_decision: msg.decision });
           setShowApprovalModal(true);
           setIsProcessing(false);
 
         } else if (msg.type === 'completed') {
-          addMessage('System', '✅ Analysis cycle complete.', 'system');
+          pushLog('✅ Analysis cycle complete.');
           setIsProcessing(false);
 
         } else if (msg.type === 'error') {
-          addMessage('System', `❌ Error: ${msg.message}`, 'system');
+          pushLog(`❌ ${msg.message}`);
           setIsProcessing(false);
         }
-      } catch (err) {
-        console.error('[WS] Parse error', err);
-      }
+      } catch (err) { console.error('[WS]', err); }
     };
   };
 
   const handleResolution = async (action: 'approve' | 'reject') => {
     setShowApprovalModal(false);
-    addMessage('System', `Human operator ${action === 'approve' ? '✅ approved' : '❌ rejected'} the trade.`, 'system');
+    pushLog(`Human operator ${action === 'approve' ? '✅ approved' : '❌ rejected'} the trade.`);
     try {
       const res = await fetch(`http://localhost:8000/api/v1/signals/${symbol.replace('/', '_')}/resolve`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action })
       });
       const data = await res.json();
-      if (data.status === 'resolved') {
-        addMessage('System', `Pipeline resumed. Trade ${action === 'approve' ? 'executed' : 'rejected'}.`, 'system');
-      }
-    } catch {
-      addMessage('System', 'Error contacting resolution endpoint.', 'system');
-    }
+      if (data.status === 'resolved') pushLog(`Trade ${action === 'approve' ? 'executed in paper portfolio.' : 'rejected.'}`);
+    } catch { pushLog('Error contacting resolution endpoint.'); }
   };
+
+  const openAgentPanel = (node: string) => {
+    setSelectedAgent(node);
+    setSidePanelMode('agent');
+  };
+
+  const selected = selectedAgent ? agentReports[selectedAgent] : null;
 
   return (
     <Layout>
       <div className="agents-page-wrapper">
+        {/* Header */}
         <header className="agents-header">
           <h1>Agents Collaborative Network</h1>
           <div className="symbol-input-group">
-            <input
-              type="text"
-              className="symbol-input"
-              value={symbol}
-              onChange={(e) => setSymbol(e.target.value)}
-              placeholder="e.g. BTCUSDT"
-            />
+            <input type="text" className="symbol-input" value={symbol}
+              onChange={(e) => setSymbol(e.target.value.toUpperCase())} placeholder="e.g. BTCUSDT" />
             <button className="trigger-btn" onClick={startAnalysis} disabled={isProcessing}>
               {isProcessing ? 'Processing…' : 'Analyze Market'}
             </button>
           </div>
         </header>
 
+        {/* Ticker bar */}
+        <div className="ticker-bar">
+          <span className={`ticker-msg ${tickerVisible ? 'visible' : ''}`}>{tickerMsg}</span>
+        </div>
+
         <div className="agents-workspace">
           {/* Chart */}
           <div className="agents-chart-view">
-            <TradingViewWidget
-              symbol={symbol}
-              theme="dark"
-              allow_symbol_change={false}
-              hide_side_toolbar={false}
-              interval="15"
-            />
+            <TradingViewWidget symbol={symbol} theme="dark" allow_symbol_change={false} hide_side_toolbar={false} interval="15" />
           </div>
 
-          {/* Pipeline Nodes */}
+          {/* Pipeline */}
           <div className="agents-network-view">
             <h2 className="network-title">Processing Pipeline</h2>
 
+            {/* Market Data node */}
             <div className={`agent-node ${nodeStatus.MarketData}`} style={{ marginBottom: '1rem' }}>
               <h3><div className="status-indicator" /> {nodeLabel.MarketData}</h3>
-              <p style={{ fontSize: '0.9rem', color: '#888', margin: 0 }}>Streams CCXT prices, OHLCV, and order book</p>
+              <p className="node-sub">Streams live OHLCV, price, and order book data</p>
             </div>
 
+            {/* 4 Analysis agent nodes */}
             <div className="nodes-container">
-              {['TechnicalAgent', 'SentimentAgent', 'OrderFlowAgent', 'RiskAgent'].map(n => (
-                <div key={n} className={`agent-node ${nodeStatus[n]}`}>
-                  <h3><div className="status-indicator" /> {nodeLabel[n]}</h3>
-                </div>
-              ))}
+              {['TechnicalAgent', 'SentimentAgent', 'OrderFlowAgent', 'RiskAgent'].map(n => {
+                const r = agentReports[n];
+                return (
+                  <div key={n} className={`agent-node ${nodeStatus[n]} ${r ? 'clickable' : ''}`}
+                    onClick={() => r && openAgentPanel(n)}>
+                    <h3><div className="status-indicator" /> {nodeLabel[n]}</h3>
+                    {r && (
+                      <div className="node-result">
+                        <span className="node-signal" style={{ color: signalColor[r.signal] ?? '#fff' }}>{r.signal}</span>
+                        <span className="node-conf">{Math.round(r.confidence * 100)}%</span>
+                        <span className="node-view-hint">Click to view →</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
-            <div className={`decision-node ${nodeStatus.DecisionAgent}`}>
-              <h3>Final Aggregation Agent</h3>
-              <div className={`decision-result ${decision ?? ''}`} style={decision ? { color: signalColor[decision] ?? '#fff' } : {}}>
-                {decision ?? 'PENDING'}
+            {/* Decision node */}
+            <div className={`decision-node ${nodeStatus.DecisionAgent} ${decisionData ? 'clickable' : ''}`}
+              onClick={() => decisionData && setSidePanelMode('decision')}>
+              <h3>Final Aggregation Agent{decisionData && <span className="node-view-hint" style={{ marginLeft: 8 }}>View →</span>}</h3>
+              <div className="decision-result" style={{ color: decisionData ? (signalColor[decisionData.final_decision] ?? '#fff') : '#888' }}>
+                {decisionData?.final_decision ?? 'PENDING'}
               </div>
             </div>
           </div>
 
-          {/* Chat Panel */}
-          <div className="agents-chat-panel">
-            <div className="chat-header">Internal Agent Dialogue</div>
-            <div className="chat-messages">
-              {messages.length === 0 && (
-                <div style={{ color: '#666', textAlign: 'center', marginTop: '40%' }}>
-                  No active session. Enter a symbol and click Analyze Market.
+          {/* Side Panel */}
+          <div className={`side-panel ${sidePanelMode ? 'open' : ''}`}>
+            <button className="side-panel-close" onClick={() => setSidePanelMode(null)}>✕</button>
+
+            {sidePanelMode === 'agent' && selected && (
+              <>
+                <div className="side-panel-title">{selected.label}</div>
+                <div className="side-panel-signal-row">
+                  <span className="sp-signal" style={{ color: signalColor[selected.signal] ?? '#fff' }}>{selected.signal}</span>
+                  <span className="sp-conf">{Math.round(selected.confidence * 100)}% confidence</span>
                 </div>
-              )}
-              {messages.map((m) => (
-                <div key={m.id} className={`chat-message ${m.type === 'system' ? 'system' : ''}`}>
-                  {m.type !== 'system' && <div className="chat-author">{m.author}</div>}
-                  <div className="chat-text">{m.text}</div>
+                <div className="sp-section-title">Reasoning</div>
+                <div className="sp-reasoning">{selected.reasoning}</div>
+                {(selected.entry || selected.stop_loss || selected.take_profit) && (
+                  <>
+                    <div className="sp-section-title">Trade Levels</div>
+                    <div className="sp-levels">
+                      {selected.entry && <div><span>Entry</span><strong>${selected.entry.toLocaleString()}</strong></div>}
+                      {selected.stop_loss && <div><span>Stop Loss</span><strong style={{ color: '#e74c3c' }}>${selected.stop_loss.toLocaleString()}</strong></div>}
+                      {selected.take_profit && <div><span>Take Profit</span><strong style={{ color: '#2ecc71' }}>${selected.take_profit.toLocaleString()}</strong></div>}
+                    </div>
+                  </>
+                )}
+              </>
+            )}
+
+            {sidePanelMode === 'decision' && (
+              <>
+                <div className="side-panel-title">Final Decision</div>
+                <div className="sp-final-decision" style={{ color: decisionData ? (signalColor[decisionData.final_decision] ?? '#fff') : '#888' }}>
+                  {decisionData?.final_decision ?? '—'}
                 </div>
-              ))}
-              <div ref={messagesEndRef} />
-            </div>
+                {decisionData?.details && (
+                  <>
+                    <div className="sp-meta-row">
+                      <span>Confidence</span><strong>{Math.round((decisionData.details.confidence ?? 0) * 100)}%</strong>
+                    </div>
+                    <div className="sp-meta-row">
+                      <span>Conviction Score</span><strong>{(decisionData.details.score ?? 0).toFixed(2)}</strong>
+                    </div>
+                    {decisionData.details.reasoning_summary && (
+                      <>
+                        <div className="sp-section-title" style={{ marginTop: '1rem' }}>Synthesis</div>
+                        <div className="sp-reasoning">{decisionData.details.reasoning_summary}</div>
+                      </>
+                    )}
+                    {(decisionData.details.avg_entry || decisionData.details.avg_stop_loss || decisionData.details.avg_take_profit) && (
+                      <>
+                        <div className="sp-section-title">Consensus Levels</div>
+                        <div className="sp-levels">
+                          {decisionData.details.avg_entry && <div><span>Avg Entry</span><strong>${decisionData.details.avg_entry.toLocaleString()}</strong></div>}
+                          {decisionData.details.avg_stop_loss && <div><span>Avg Stop Loss</span><strong style={{ color: '#e74c3c' }}>${decisionData.details.avg_stop_loss.toLocaleString()}</strong></div>}
+                          {decisionData.details.avg_take_profit && <div><span>Avg Take Profit</span><strong style={{ color: '#2ecc71' }}>${decisionData.details.avg_take_profit.toLocaleString()}</strong></div>}
+                        </div>
+                      </>
+                    )}
+                  </>
+                )}
+
+                <div className="sp-section-title" style={{ marginTop: '1.5rem' }}>Agent Votes</div>
+                <div className="sp-votes">
+                  {['TechnicalAgent', 'SentimentAgent', 'OrderFlowAgent', 'RiskAgent'].map(n => {
+                    const r = agentReports[n];
+                    return (
+                      <div key={n} className="sp-vote-row" onClick={() => r && openAgentPanel(n)}>
+                        <span className="sp-vote-label">{nodeLabel[n]}</span>
+                        {r ? (
+                          <span className="sp-vote-signal" style={{ color: signalColor[r.signal] ?? '#aaa' }}>{r.signal}</span>
+                        ) : (
+                          <span className="sp-vote-signal" style={{ color: '#555' }}>—</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
 
+      {/* Approval Modal */}
       {showApprovalModal && (
         <div className="modal-overlay">
           <div className="approval-modal">
             <h2>Human Approval Required</h2>
             <div className="modal-content">
-              <p>The Decision Agent has proposed a trade that requires your verification before execution.</p>
+              <p>The Decision Agent has proposed a trade that requires your verification.</p>
               <div className="proposed-trade">
                 <strong>Symbol:</strong> {symbol}<br />
-                <strong>Proposed Action:</strong>{' '}
-                <span style={{ color: signalColor[decision ?? ''] ?? '#fff', fontWeight: 'bold', fontSize: '1.2rem' }}>
-                  {decision}
+                <strong>Action:</strong>{' '}
+                <span style={{ color: signalColor[decisionData?.final_decision ?? ''] ?? '#fff', fontWeight: 'bold', fontSize: '1.3rem' }}>
+                  {decisionData?.final_decision}
                 </span>
               </div>
             </div>
             <div className="modal-actions">
-              <button className="btn-reject" onClick={() => handleResolution('reject')}>❌ Reject Trade</button>
-              <button className="btn-approve" onClick={() => handleResolution('approve')}>✅ Approve Trade</button>
+              <button className="btn-reject" onClick={() => handleResolution('reject')}>❌ Reject</button>
+              <button className="btn-approve" onClick={() => handleResolution('approve')}>✅ Approve</button>
             </div>
           </div>
         </div>
