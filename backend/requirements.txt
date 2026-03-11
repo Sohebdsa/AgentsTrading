@@ -1,11 +1,14 @@
 fastapi
-uvicorn
+uvicorn[standard]
+websockets
 pydantic
 pydantic-settings
 sqlalchemy[asyncio]
 aiosqlite
 ccxt
 langgraph
+langgraph-checkpoint-sqlite
+langchain-core
 langchain-openai
 python-dotenv
 loguru

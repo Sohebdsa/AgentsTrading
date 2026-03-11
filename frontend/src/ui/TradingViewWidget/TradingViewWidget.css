@@ -7,6 +7,8 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  height: 100%;
+  flex: 1;
 }
 
 /* ── Optional title above the card ───────────────────────── */
@@ -26,6 +28,8 @@
   border: 1px solid var(--border, rgba(255,255,255,0.06));
   border-radius: 12px;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 
   /* subtle orange top edge */
   box-shadow:

@@ -1,32 +1,57 @@
 from typing import Dict, Any
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_openai import ChatOpenAI
+from pydantic import BaseModel, Field
+
 from graph.state import AgentState, AgentSignal
+
+class RiskOutput(BaseModel):
+    signal: str = Field(description="Must be exactly one of: WAIT (safe to trade), AVOID (too risky to trade)")
+    confidence: float = Field(description="Confidence score between 0.0 and 1.0")
+    reasoning: str = Field(description="Detailed explanation of the risk assessment")
 
 async def risk_agent(state: AgentState) -> Dict[str, Any]:
     """
     Analyzes volatility and macro market risk. This agent can issue an AVOID 
     signal which acts as a veto against trades.
     """
-    print("Running Risk and Timing Agent...")
+    print("Running Risk and Timing Agent (LLM Powered)...")
     
-    # Mock volatility index (e.g. VIX approximation or historical ATR)
-    current_volatility = 0.85 # High volatility
-    max_acceptable_volatility = 0.80
+    symbol = state.get("symbol", "UNKNOWN")
     
-    if current_volatility > max_acceptable_volatility:
-        signal_out = "AVOID"
-        reason = f"Market volatility ({current_volatility}) exceeds threshold ({max_acceptable_volatility}). Unsafe to enter."
-        conf = 0.95
-    else:
-        signal_out = "WAIT" # Doesn't enforce a trade, just passes safe check
-        reason = "Market volatility is within acceptable limits for trading."
-        conf = 0.9
+    # Mock broader market conditions for now
+    vix_approximation = 25 # Elevated volatility
+    btc_dominance = 52.5
+    
+    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+    structured_llm = llm.with_structured_output(RiskOutput)
+    
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", "You are an expert Risk Management AI Agent. Assess the current market conditions. If conditions are extremely volatile, uncertain, or risky, issue an 'AVOID' signal to stop trading. If conditions are acceptable, issue a 'WAIT' signal (which just means 'no veto'). Provide a confidence score and reasoning."),
+        ("human", "Asset: {symbol}\n\nMacro Indicators:\nVIX Proxy: {vix}\nBTC Dominance: {btcdom}%\n\nCurrent Market Context:\nModerate volatility observed in recent sessions. Inflation data coming tomorrow.")
+    ])
+    
+    try:
+        chain = prompt | structured_llm
+        response: RiskOutput = await chain.ainvoke({
+            "symbol": symbol,
+            "vix": vix_approximation,
+            "btcdom": btc_dominance
+        })
         
-    signal = AgentSignal(
-        agent_name="Risk",
-        signal=signal_out,
-        confidence=conf,
-        reasoning=reason,
-        suggested_entry=None, stop_loss=None, take_profit=None, time_window=None
-    )
-    
+        signal = AgentSignal(
+            agent_name="Risk",
+            signal=response.signal, # type: ignore
+            confidence=response.confidence,
+            reasoning=response.reasoning,
+            suggested_entry=None, stop_loss=None, take_profit=None, time_window=None
+        )
+    except Exception as e:
+        print(f"Risk Agent LLM Error: {e}")
+        signal = AgentSignal(
+            agent_name="Risk", signal="WAIT", confidence=0.0,
+            reasoning=f"LLM Processing Error: {str(e)}",
+            suggested_entry=None, stop_loss=None, take_profit=None, time_window=None
+        )
+        
     return {"signals": [signal]}

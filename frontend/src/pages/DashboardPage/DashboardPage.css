@@ -88,11 +88,13 @@
     display: grid;
     grid-template-columns: 38fr 62fr;
     gap: 24px;
-    align-items: start;
+    align-items: stretch;
 }
 
 /* ── Panel card ──────────────────────────────────────────── */
 .dash-panel {
+    display: flex;
+    flex-direction: column;
     background: #111111;
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 14px;
