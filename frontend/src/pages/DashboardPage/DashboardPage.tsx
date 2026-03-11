@@ -65,7 +65,7 @@ const DashboardPage = () => {
                         <TradingViewWidget
                             symbol="NASDAQ:AAPL"
                             interval="D"
-                            height={500}
+                            height={600}
                         />
                     </section>
                 </div>
