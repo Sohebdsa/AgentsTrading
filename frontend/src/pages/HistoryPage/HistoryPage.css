@@ -1,0 +1,176 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+.history-page-wrapper {
+  font-family: 'Inter', sans-serif;
+  padding: 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  height: 100%;
+  background: var(--bg-base);
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-bottom: 1px solid var(--border-dim);
+  padding-bottom: 1rem;
+}
+
+.history-header h1 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.history-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0.25rem 0 0 0;
+}
+
+.history-metrics {
+  display: flex;
+  gap: 1.25rem;
+}
+
+.metric-box {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  min-width: 120px;
+}
+
+.metric-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.metric-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-top: 0.2rem;
+}
+
+.metric-value.positive { color: var(--buy); }
+.metric-value.negative { color: var(--sell); }
+.metric-value.neutral { color: var(--text-primary); }
+
+/* Table Setup */
+.table-container {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden; /* For border radius */
+  overflow-x: auto;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.history-table th {
+  background: var(--bg-elevated);
+  padding: 0.75rem 1rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border);
+}
+
+.history-table td {
+  padding: 0.65rem 1rem;
+  font-size: 0.8rem;
+  border-bottom: 1px solid var(--border-dim);
+  color: var(--text-secondary);
+}
+
+.history-table tr:hover td {
+  background: var(--bg-hover);
+}
+
+.history-table tr:last-child td {
+  border-bottom: none;
+}
+
+.num-col {
+  text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Specific Cells */
+.id-cell {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--text-muted) !important;
+}
+
+.date-cell {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.75rem;
+}
+
+.symbol-cell {
+  font-weight: 600;
+  color: var(--text-primary) !important;
+  letter-spacing: 0.02em;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+
+.badge.BUY {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--buy);
+}
+
+.badge.SELL {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--sell);
+}
+
+.price-cell {
+  font-size: 0.75rem;
+  color: var(--text-primary) !important;
+}
+
+.size-cell {
+  font-size: 0.75rem;
+}
+
+.pnl-cell {
+  font-weight: 600;
+}
+
+.pnl-cell.positive {
+  color: var(--buy) !important;
+}
+
+.pnl-cell.negative {
+  color: var(--sell) !important;
+}
+
+.duration-cell {
+  font-size: 0.75rem;
+}

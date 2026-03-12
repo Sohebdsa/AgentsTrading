@@ -80,7 +80,7 @@ const TradingViewWidget = ({
         <div className={`tv-widget-wrapper ${className}`}>
             {title && <h3 className="tv-widget-title">{title}</h3>}
 
-            <div className="tv-widget-card">
+            <div className="tv-widget-card" style={{ flex: 1 }}>
                 {/* 
                   React only renders the outer wrapper.
                   The inner chart div, copyright link, and script are injected via useEffect
