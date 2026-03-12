@@ -17,7 +17,7 @@ CubeXAgents is a state-of-the-art autonomous trading system built on a multi-age
 
 The system is fully observable through a professional, Bloomberg-terminal-inspired React dashboard, allowing users to watch agents debate, vote, and execute live or paper trades in real-time.
 
-![CubeXAgents Dashboard Demo](previews/dashboard_placeholder.png)
+![CubeXAgents Dashboard Demo](doc_assets/dashboard_placeholder.png)
 *(Screenshot: Main Dashboard showcasing live AI agent decisions and market charts)*
 
 ## ✨ Architecture & Features
@@ -32,7 +32,7 @@ The system is fully observable through a professional, Bloomberg-terminal-inspir
 ### Human-in-the-Loop Operations
 The pipeline natively supports a Human-in-the-loop (HITL) architecture. The execution pauses after the master decision agent formulates a trade plan, sending a WebSocket pulse to the frontend for human approval. Upon approval (or rejection), the LangGraph memory state resumes seamlessly.
 
-![Agents Workspace](previews/agents_workspace_placeholder.png)
+![Agents Workspace](doc_assets/agents_workspace_placeholder.png)
 *(Screenshot: The Agents Workspace showing real-time agent processing and the human approval modal)*
 
 ### Technical Stack
@@ -92,7 +92,7 @@ npm run dev
 
 | Trade History Terminal | Agent Live Reasoning |
 | :---: | :---: |
-| ![Trade History](previews/trade_history_placeholder.png) | ![Agent Reasoning](previews/agent_reasoning_placeholder.png) |
+| ![Trade History](doc_assets/trade_history_placeholder.png) | ![Agent Reasoning](doc_assets/agent_reasoning_placeholder.png) |
 | *Log of all executed paper trades, showing PnL, Win Rates, and trade durations.* | *The slide-out panel detailing exact LLM reasoning, signal confidence, and consensus levels.* |
 
 ## 🧩 Pipeline Lifecycle
