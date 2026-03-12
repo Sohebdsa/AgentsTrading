@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <linearGradient id="cxaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f2fe" />
+      <stop offset="100%" stop-color="#4facfe" />
+    </linearGradient>
+  </defs>
+  <!-- Outer Hexagon -->
+  <path d="M50 5 L89 27.5 L89 72.5 L50 95 L11 72.5 L11 27.5 Z" fill="none" stroke="url(#cxaGrad)" stroke-width="6" stroke-linejoin="round" />
+  <!-- Inner Y lines -->
+  <path d="M50 5 L50 50 L89 72.5 M11 27.5 L50 50 L11 72.5 M89 27.5 L50 50" fill="none" stroke="rgba(79, 172, 254, 0.5)" stroke-width="3" stroke-linejoin="round" />
+  <!-- Center Core -->
+  <circle cx="50" cy="50" r="6" fill="#00f2fe" />
+  <!-- AI Agent Dots (Nodes) -->
+  <circle cx="50" cy="5" r="4" fill="#fff" />
+  <circle cx="89" cy="27.5" r="4" fill="#fff" />
+  <circle cx="89" cy="72.5" r="4" fill="#fff" />
+  <circle cx="50" cy="95" r="4" fill="#fff" />
+  <circle cx="11" cy="72.5" r="4" fill="#fff" />
+  <circle cx="11" cy="27.5" r="4" fill="#fff" />
+</svg>
