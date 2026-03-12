@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="frontend/public/vite.svg" alt="CubeXAgents Logo" width="80" height="80">
+  <img src="doc_assets/logo.svg" alt="CubeXAgents Logo" width="80" height="80">
   <h1 align="center">CubeXAgents</h1>
   <p align="center">
     <strong>Autonomous, Multi-Agent AI Trading System</strong>
