@@ -4,6 +4,7 @@ export const NAV_LINKS = [
     { label: 'Dashboard', href: '/dashboard' },
     { label: 'Agents', href: '/agents' },
     { label: 'Trade History', href: '/trade-history' },
+    { label: 'Data Explorer', href: '/data-explorer' },
 ] as const;
 
 // ─── Login dropdown options ──────────────────

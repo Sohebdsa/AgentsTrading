@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { NAV_LINKS, LOGIN_OPTIONS } from '../../common/constants/nav';
 import type { NavItemsProps } from '../../common/types';
 
 const NavItems = ({ mobile = false, onClose }: NavItemsProps) => {
     const [loginOpen, setLoginOpen] = useState(false);
     const dropdownRef = useRef<HTMLLIElement>(null);
+    const location = useLocation();
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -18,19 +20,19 @@ const NavItems = ({ mobile = false, onClose }: NavItemsProps) => {
     }, []);
 
     const isActive = (href: string) =>
-        window.location.pathname === href ? 'active' : '';
+        location.pathname === href ? 'active' : '';
 
     return (
         <ul className={`cxa-nav-list ${mobile ? 'mobile' : ''}`}>
             {NAV_LINKS.map((link) => (
                 <li key={link.label}>
-                    <a
-                        href={link.href}
+                    <Link
+                        to={link.href}
                         className={`cxa-nav-link ${isActive(link.href)}`}
                         onClick={onClose}
                     >
                         {link.label}
-                    </a>
+                    </Link>
                 </li>
             ))}
 
@@ -63,9 +65,9 @@ const NavItems = ({ mobile = false, onClose }: NavItemsProps) => {
                 <ul className={`cxa-dropdown ${loginOpen ? 'visible' : ''}`} role="listbox">
                     {LOGIN_OPTIONS.map((opt) => (
                         <li key={opt.href} role="option">
-                            <a href={opt.href} className="cxa-dropdown-item" onClick={onClose}>
+                            <Link to={opt.href} className="cxa-dropdown-item" onClick={onClose}>
                                 {opt.label}
-                            </a>
+                            </Link>
                         </li>
                     ))}
                 </ul>
