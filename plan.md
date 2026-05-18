@@ -11,7 +11,10 @@ pip install -r requirements.txt
 # 2. Run the Backend
 
 ```bash
-uvicorn backend.api.main:app --reload
+cd backend
+.\venv\Scripts\activate
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+
 ```
 
 # 3. Run the Frontend

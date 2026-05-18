@@ -7,8 +7,8 @@ class Settings(BaseSettings):
     # "postgresql+asyncpg://user:password@localhost/dbname"
     DATABASE_URL: str = "sqlite+aiosqlite:///./trading.db"
     
-    # LLM Settings
-    OPENAI_API_KEY: str = ""
+    # LLM Settings (Gemini)
+    GOOGLE_API_KEY: str = "AIzaSyA8Nb2_wcv-R1SWBnIoQjwcjK2X4irGSew"
     
     class Config:
         env_file = ".env"

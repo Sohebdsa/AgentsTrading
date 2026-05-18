@@ -1,9 +1,15 @@
 from typing import Dict, Any
+import os
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from pydantic import BaseModel, Field
 
 from graph.state import AgentState, AgentSignal
+
+# Load SKILL.md at module level
+_SKILL_PATH = os.path.join(os.path.dirname(__file__), "skills", "risk_SKILL.md")
+with open(_SKILL_PATH, "r", encoding="utf-8") as f:
+    SKILL_CONTENT = f.read()
 
 class RiskOutput(BaseModel):
     signal: str = Field(description="Must be exactly one of: WAIT (safe to trade), AVOID (too risky to trade)")
@@ -15,7 +21,7 @@ async def risk_agent(state: AgentState) -> Dict[str, Any]:
     Analyzes volatility and macro market risk. This agent can issue an AVOID 
     signal which acts as a veto against trades.
     """
-    print("Running Risk and Timing Agent (LLM Powered)...")
+    print("Running Risk and Timing Agent (Gemini Powered)...")
     
     symbol = state.get("symbol", "UNKNOWN")
     
@@ -23,11 +29,11 @@ async def risk_agent(state: AgentState) -> Dict[str, Any]:
     vix_approximation = 25 # Elevated volatility
     btc_dominance = 52.5
     
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+    llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", temperature=0)
     structured_llm = llm.with_structured_output(RiskOutput)
     
     prompt = ChatPromptTemplate.from_messages([
-        ("system", "You are an expert Risk Management AI Agent. Assess the current market conditions. If conditions are extremely volatile, uncertain, or risky, issue an 'AVOID' signal to stop trading. If conditions are acceptable, issue a 'WAIT' signal (which just means 'no veto'). Provide a confidence score and reasoning."),
+        ("system", SKILL_CONTENT + "\n\nAssess the current market conditions. If conditions are extremely volatile, uncertain, or risky, issue an 'AVOID' signal. If conditions are acceptable, issue a 'WAIT' signal (no veto). Provide a confidence score and reasoning."),
         ("human", "Asset: {symbol}\n\nMacro Indicators:\nVIX Proxy: {vix}\nBTC Dominance: {btcdom}%\n\nCurrent Market Context:\nModerate volatility observed in recent sessions. Inflation data coming tomorrow.")
     ])
     

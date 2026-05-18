@@ -1,11 +1,17 @@
 from typing import Dict, Any
+import os
 import pandas as pd
 import ta
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from pydantic import BaseModel, Field
 
 from graph.state import AgentState, AgentSignal
+
+# Load SKILL.md at module level
+_SKILL_PATH = os.path.join(os.path.dirname(__file__), "skills", "technical_SKILL.md")
+with open(_SKILL_PATH, "r", encoding="utf-8") as f:
+    SKILL_CONTENT = f.read()
 
 class SignalOutput(BaseModel):
     signal: str = Field(description="Must be exactly one of: BUY, SELL, WAIT, or AVOID")
@@ -20,7 +26,7 @@ async def technical_analysis_agent(state: AgentState) -> Dict[str, Any]:
     """
     Analyzes historical price data using technical indicators and an LLM to formulate a signal.
     """
-    print("Running Technical Analysis Agent (LLM Powered)...")
+    print("Running Technical Analysis Agent (Gemini Powered)...")
     
     market_data = state.get("market_data", {})
     df_dict = market_data.get("ohlcv")
@@ -47,11 +53,11 @@ async def technical_analysis_agent(state: AgentState) -> Dict[str, Any]:
     latest = df.iloc[-1]
     recent_action = df.tail(5)[['timestamp', 'open', 'high', 'low', 'close', 'volume']].to_string(index=False)
     
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+    llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", temperature=0)
     structured_llm = llm.with_structured_output(SignalOutput)
     
     prompt = ChatPromptTemplate.from_messages([
-        ("system", "You are an expert Technical Analysis AI Agent. Analyze the provided price data and technical indicators. Provide a highly accurate trading signal (BUY, SELL, WAIT) with detailed reasoning based strictly on technical analysis principles."),
+        ("system", SKILL_CONTENT + "\n\nAnalyze the provided price data and technical indicators. Provide a highly accurate trading signal with detailed reasoning."),
         ("human", "Symbol: {symbol}\nTimeframe: {timeframe}\nLatest Close: ${close}\nSMA(50): ${sma}\nRSI(14): {rsi}\nMACD: {macd}, MACD Signal: {macd_signal}\n\nRecent Price Candles:\n{recent_action}")
     ])
     

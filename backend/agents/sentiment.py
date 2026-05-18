@@ -1,9 +1,15 @@
 from typing import Dict, Any
+import os
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from pydantic import BaseModel, Field
 
 from graph.state import AgentState, AgentSignal
+
+# Load SKILL.md at module level
+_SKILL_PATH = os.path.join(os.path.dirname(__file__), "skills", "sentiment_SKILL.md")
+with open(_SKILL_PATH, "r", encoding="utf-8") as f:
+    SKILL_CONTENT = f.read()
 
 class SentimentOutput(BaseModel):
     signal: str = Field(description="Must be exactly one of: BUY, SELL, WAIT, or AVOID")
@@ -14,7 +20,7 @@ async def sentiment_analysis_agent(state: AgentState) -> Dict[str, Any]:
     """
     Analyzes news headlines and social media sentiment using an LLM.
     """
-    print("Running Sentiment Analysis Agent (LLM Powered)...")
+    print("Running Sentiment Analysis Agent (Gemini Powered)...")
     
     symbol = state.get("symbol", "UNKNOWN")
     
@@ -27,11 +33,11 @@ async def sentiment_analysis_agent(state: AgentState) -> Dict[str, Any]:
     4. General macroeconomic fear grips the broader market, investors cautious.
     """
     
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+    llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", temperature=0)
     structured_llm = llm.with_structured_output(SentimentOutput)
     
     prompt = ChatPromptTemplate.from_messages([
-        ("system", "You are an expert Sentiment Analysis AI Agent. Analyze the provided news updates and social sentiment for the asset. Determine if the overall sentiment is bullish (BUY), bearish (SELL), or neutral (WAIT). Output a strict confidence score and reasoning."),
+        ("system", SKILL_CONTENT + "\n\nAnalyze the provided news updates and social sentiment for the asset. Output a strict confidence score and reasoning."),
         ("human", "Asset: {symbol}\n\nRecent News & Social Trends:\n{news}")
     ])
     

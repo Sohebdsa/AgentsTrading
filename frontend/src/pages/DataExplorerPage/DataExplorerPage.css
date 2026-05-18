@@ -1,0 +1,457 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ─── Page wrapper ───────────────────────────────────────── */
+.dex-page {
+  font-family: 'Inter', sans-serif;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-base, #0d0f11);
+}
+
+/* ─── Header ─────────────────────────────────────────────── */
+.dex-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--border-dim, #1c2028);
+}
+
+.dex-header h1 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-secondary, #8892a0);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.dex-controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.dex-input {
+  padding: 0.35rem 0.75rem;
+  border-radius: 5px;
+  border: 1px solid var(--border, #252a32);
+  background: var(--bg-surface, #13161a);
+  color: var(--text-primary, #e2e8f0);
+  outline: none;
+  font-size: 0.85rem;
+  font-family: 'JetBrains Mono', monospace;
+  width: 120px;
+  transition: border-color 0.15s;
+}
+.dex-input:focus { border-color: var(--accent-blue, #3b82f6); }
+
+.dex-select {
+  padding: 0.35rem 0.75rem;
+  border-radius: 5px;
+  border: 1px solid var(--border, #252a32);
+  background: var(--bg-surface, #13161a);
+  color: var(--text-primary, #e2e8f0);
+  outline: none;
+  font-size: 0.82rem;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238892a0' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.6rem center;
+  padding-right: 1.8rem;
+}
+.dex-select:focus { border-color: var(--accent-blue, #3b82f6); }
+
+.dex-btn {
+  padding: 0.35rem 1rem;
+  border-radius: 5px;
+  border: 1px solid var(--accent-blue, #3b82f6);
+  background: rgba(59,130,246,0.1);
+  color: var(--accent-blue, #3b82f6);
+  font-weight: 500;
+  font-size: 0.82rem;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: background 0.15s, color 0.15s;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.dex-btn:hover { background: var(--accent-blue, #3b82f6); color: #fff; }
+.dex-btn:disabled { opacity: 0.35; cursor: not-allowed; background: transparent; }
+
+.dex-btn--ai {
+  border-color: #a855f7;
+  background: rgba(168,85,247,0.1);
+  color: #a855f7;
+}
+.dex-btn--ai:hover { background: #a855f7; color: #fff; }
+.dex-btn--ai:disabled { opacity: 0.35; cursor: not-allowed; background: transparent; }
+
+/* ─── Status strip ───────────────────────────────────────── */
+.dex-status-strip {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.dex-status-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 5px;
+  background: var(--bg-surface, #13161a);
+  border: 1px solid var(--border-dim, #1c2028);
+  font-size: 0.78rem;
+  color: var(--text-muted, #4a5568);
+  font-family: 'JetBrains Mono', monospace;
+  transition: border-color 0.3s, color 0.3s;
+  min-width: 120px;
+}
+
+.dex-status-item.fetching {
+  border-color: #374151;
+  color: var(--text-secondary, #8892a0);
+}
+
+.dex-status-item.done {
+  border-color: rgba(16,185,129,0.3);
+  color: var(--buy, #10b981);
+}
+
+.dex-status-item.error {
+  border-color: rgba(239,68,68,0.3);
+  color: var(--sell, #ef4444);
+}
+
+/* Spinner */
+.dex-spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid transparent;
+  border-top-color: var(--accent-blue, #3b82f6);
+  border-radius: 50%;
+  animation: dex-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes dex-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Green tick */
+.dex-tick {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--buy, #10b981);
+  animation: dex-tick-in 0.35s ease-out;
+}
+
+@keyframes dex-tick-in {
+  0%   { transform: scale(0) rotate(-45deg); opacity: 0; }
+  60%  { transform: scale(1.2) rotate(0deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+/* Error X */
+.dex-error-icon {
+  color: var(--sell, #ef4444);
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.dex-idle-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--border, #252a32);
+  flex-shrink: 0;
+}
+
+/* ─── Content area ───────────────────────────────────────── */
+.dex-content {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 0;
+}
+
+/* ─── Data cards ─────────────────────────────────────────── */
+.dex-card {
+  background: var(--bg-surface, #13161a);
+  border: 1px solid var(--border, #252a32);
+  border-radius: 6px;
+  overflow: hidden;
+  animation: dex-card-in 0.3s ease-out;
+}
+
+@keyframes dex-card-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.dex-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.55rem 0.85rem;
+  border-bottom: 1px solid var(--border-dim, #1c2028);
+}
+
+.dex-card-title {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted, #4a5568);
+  margin: 0;
+}
+
+.dex-card-badge {
+  font-size: 0.68rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 3px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+}
+.dex-card-badge.bullish {
+  background: rgba(16,185,129,0.12);
+  color: var(--buy, #10b981);
+}
+.dex-card-badge.bearish {
+  background: rgba(239,68,68,0.1);
+  color: var(--sell, #ef4444);
+}
+.dex-card-badge.neutral {
+  background: rgba(148,163,184,0.1);
+  color: var(--wait, #94a3b8);
+}
+
+.dex-card-body {
+  padding: 0.65rem 0.85rem;
+}
+
+/* ─── Ticker stats row ───────────────────────────────────── */
+.dex-ticker-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+.dex-ticker-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.dex-ticker-stat .label {
+  font-size: 0.65rem;
+  color: var(--text-muted, #4a5568);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.dex-ticker-stat .value {
+  font-size: 0.85rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+  color: var(--text-primary, #e2e8f0);
+}
+
+.dex-ticker-stat .value.positive { color: var(--buy, #10b981); }
+.dex-ticker-stat .value.negative { color: var(--sell, #ef4444); }
+
+/* ─── Indicators row ─────────────────────────────────────── */
+.dex-indicators-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+.dex-indicator {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.dex-indicator .label {
+  font-size: 0.65rem;
+  color: var(--text-muted, #4a5568);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.dex-indicator .value {
+  font-size: 0.85rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+  color: var(--text-primary, #e2e8f0);
+}
+
+/* ─── OHLCV table ────────────────────────────────────────── */
+.dex-table-wrap {
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.dex-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.dex-table th {
+  position: sticky;
+  top: 0;
+  background: var(--bg-elevated, #1a1e24);
+  padding: 0.4rem 0.6rem;
+  text-align: left;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted, #4a5568);
+  border-bottom: 1px solid var(--border, #252a32);
+}
+
+.dex-table td {
+  padding: 0.35rem 0.6rem;
+  color: var(--text-secondary, #8892a0);
+  border-bottom: 1px solid var(--border-dim, #1c2028);
+}
+
+.dex-table tr:hover td {
+  background: var(--bg-hover, #1f242c);
+}
+
+/* ─── Orderbook ──────────────────────────────────────────── */
+.dex-orderbook-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.dex-ob-side h4 {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted, #4a5568);
+  margin: 0 0 0.35rem 0;
+}
+
+.dex-ob-side.bids h4 { color: var(--buy, #10b981); }
+.dex-ob-side.asks h4 { color: var(--sell, #ef4444); }
+
+.dex-ob-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.2rem 0;
+  font-size: 0.73rem;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.dex-ob-row .price { color: var(--text-primary, #e2e8f0); }
+.dex-ob-row .size { color: var(--text-muted, #4a5568); }
+
+.dex-ob-side.bids .dex-ob-row .price { color: var(--buy, #10b981); }
+.dex-ob-side.asks .dex-ob-row .price { color: var(--sell, #ef4444); }
+
+/* ─── AI Insight card ────────────────────────────────────── */
+.dex-ai-card {
+  border-color: rgba(168,85,247,0.25);
+}
+
+.dex-ai-card .dex-card-header {
+  border-bottom-color: rgba(168,85,247,0.15);
+}
+
+.dex-ai-card .dex-card-title {
+  color: #a855f7;
+}
+
+.dex-ai-insight-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.dex-ai-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.dex-ai-row .label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted, #4a5568);
+}
+
+.dex-ai-row .value {
+  font-size: 0.78rem;
+  color: var(--text-secondary, #8892a0);
+  line-height: 1.55;
+}
+
+.dex-ai-row .value.trend-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+  font-size: 0.8rem;
+}
+.dex-ai-row .value.trend-tag.BULLISH { color: var(--buy, #10b981); }
+.dex-ai-row .value.trend-tag.BEARISH { color: var(--sell, #ef4444); }
+.dex-ai-row .value.trend-tag.SIDEWAYS { color: var(--wait, #94a3b8); }
+
+/* ─── Empty state ────────────────────────────────────────── */
+.dex-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0.5rem;
+  color: var(--text-muted, #4a5568);
+  font-size: 0.85rem;
+}
+
+.dex-empty-icon {
+  font-size: 2rem;
+  opacity: 0.3;
+}
+
+/* ─── Dropdown viewer selector ───────────────────────────── */
+.dex-view-select {
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid var(--border, #252a32);
+  background: var(--bg-elevated, #1a1e24);
+  color: var(--text-primary, #e2e8f0);
+  font-size: 0.78rem;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238892a0' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  padding-right: 1.5rem;
+}

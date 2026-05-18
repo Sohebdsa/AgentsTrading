@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 from core.database import engine, Base
-from api.routes import trading
+from api.routes import trading, binance_data
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -38,6 +38,7 @@ app.add_middleware(
 
 # Register routes
 app.include_router(trading.router, prefix="/api/v1")
+app.include_router(binance_data.router, prefix="/api/v1")
 
 @app.get("/")
 async def root():

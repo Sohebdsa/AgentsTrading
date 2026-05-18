@@ -1,9 +1,15 @@
 from typing import Dict, Any
+import os
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from pydantic import BaseModel, Field
 
 from graph.state import AgentState, AgentSignal
+
+# Load SKILL.md at module level
+_SKILL_PATH = os.path.join(os.path.dirname(__file__), "skills", "order_flow_SKILL.md")
+with open(_SKILL_PATH, "r", encoding="utf-8") as f:
+    SKILL_CONTENT = f.read()
 
 class OrderFlowOutput(BaseModel):
     signal: str = Field(description="Must be exactly one of: BUY, SELL, WAIT, or AVOID")
@@ -14,7 +20,7 @@ async def order_flow_agent(state: AgentState) -> Dict[str, Any]:
     """
     Analyzes the order book depth and exchange flows using an LLM.
     """
-    print("Running Order Flow Agent (LLM Powered)...")
+    print("Running Order Flow Agent (Gemini Powered)...")
     
     market_data = state.get("market_data", {})
     orderbook = market_data.get("orderbook")
@@ -34,11 +40,11 @@ async def order_flow_agent(state: AgentState) -> Dict[str, Any]:
     bids_str = "\n".join([f"Price: {p}, Size: {s}" for p, s in bids])
     asks_str = "\n".join([f"Price: {p}, Size: {s}" for p, s in asks])
     
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+    llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", temperature=0)
     structured_llm = llm.with_structured_output(OrderFlowOutput)
     
     prompt = ChatPromptTemplate.from_messages([
-        ("system", "You are an expert Order Flow and Liquidity Analysis AI Agent. Analyze the top levels of the order book. Detect bid/ask walls, spoofing, or strong buying/selling pressure. Produce a trade signal (BUY for strong bid pressure, SELL for strong ask pressure, WAIT for balanced)."),
+        ("system", SKILL_CONTENT + "\n\nAnalyze the top levels of the order book. Detect bid/ask walls, spoofing, or strong buying/selling pressure. Produce a trade signal."),
         ("human", "Asset: {symbol}\n\nTop 10 Bids (Buyers):\n{bids}\n\nTop 10 Asks (Sellers):\n{asks}")
     ])
     

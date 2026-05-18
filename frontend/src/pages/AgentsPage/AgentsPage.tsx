@@ -118,7 +118,8 @@ export default function AgentsPage() {
     setIsProcessing(true);
     pushLog(`Initializing pipeline for ${symbol}…`);
 
-    const ws = new WebSocket(`ws://localhost:8000/api/v1/ws/signals/${symbol.replace('/', '_')}`);
+    const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8000';
+    const ws = new WebSocket(`${WS_URL}/api/v1/ws/signals/${symbol.replace('/', '_')}`);
     wsRef.current = ws;
 
     ws.onerror = () => { pushLog('❌ Cannot connect to backend (port 8000).'); setIsProcessing(false); };
@@ -191,7 +192,8 @@ export default function AgentsPage() {
     setShowApprovalModal(false);
     pushLog(`Human operator ${action === 'approve' ? '✅ approved' : '❌ rejected'} the trade.`);
     try {
-      const res = await fetch(`http://localhost:8000/api/v1/signals/${symbol.replace('/', '_')}/resolve`, {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      const res = await fetch(`${API_URL}/api/v1/signals/${symbol.replace('/', '_')}/resolve`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action })
       });
