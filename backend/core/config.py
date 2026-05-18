@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite+aiosqlite:///./trading.db"
     
     # LLM Settings (Gemini)
-    GOOGLE_API_KEY: str = "AIzaSyA8Nb2_wcv-R1SWBnIoQjwcjK2X4irGSew"
+    GOOGLE_API_KEY: str = "[GCP_API_KEY]"
     
     class Config:
         env_file = ".env"
