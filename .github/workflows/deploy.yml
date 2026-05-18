@@ -1,0 +1,37 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main # Or your default branch
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Create .env files
+        run: |
+          # Create backend .env
+          echo "DATABASE_URL=sqlite+aiosqlite:///./trading.db" > backend/.env
+          echo "GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}" >> backend/.env
+          
+          # Create frontend .env to point to EC2 backend
+          echo "VITE_API_URL=http://${{ secrets.EC2_HOST }}:8000" > frontend/.env
+          echo "VITE_WS_URL=ws://${{ secrets.EC2_HOST }}:8000" >> frontend/.env
+          echo "Environment files generated successfully."
+
+      - name: Build and Deploy with Docker Compose
+        run: |
+          # Pull latest images (if using a registry, otherwise just build)
+          # Build the images using the production docker-compose file
+          docker-compose -f docker-compose.prod.yml build
+          
+          # Restart the containers in detached mode
+          docker-compose -f docker-compose.prod.yml up -d
+
+      - name: Clean up unused Docker images (Optional but recommended)
+        run: docker system prune -af --volumes

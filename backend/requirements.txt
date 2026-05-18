@@ -9,7 +9,7 @@ ccxt
 langgraph
 langgraph-checkpoint-sqlite
 langchain-core
-langchain-openai
+langchain-google-genai
 python-dotenv
 loguru
 pandas

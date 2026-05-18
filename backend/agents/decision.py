@@ -1,9 +1,15 @@
 from typing import Dict, Any
+import os
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from pydantic import BaseModel, Field
 
 from graph.state import AgentState, AgentSignal
+
+# Load SKILL.md at module level
+_SKILL_PATH = os.path.join(os.path.dirname(__file__), "skills", "decision_SKILL.md")
+with open(_SKILL_PATH, "r", encoding="utf-8") as f:
+    SKILL_CONTENT = f.read()
 
 class DecisionOutput(BaseModel):
     final_decision: str = Field(description="Must be exactly one of: BUY, SELL, or NO TRADE")
@@ -19,7 +25,7 @@ async def decision_agent(state: AgentState) -> Dict[str, Any]:
     Aggregates the signals from all four agents using an LLM.
     If the Risk agent issues AVOID, it vetoes the trade completely.
     """
-    print("Running Decision Aggregation Agent (LLM Powered)...")
+    print("Running Decision Aggregation Agent (Gemini Powered)...")
     signals = state.get("signals", [])
     symbol = state.get("symbol", "UNKNOWN")
     
@@ -36,11 +42,11 @@ async def decision_agent(state: AgentState) -> Dict[str, Any]:
         if s.get("suggested_entry"):
             signals_text += f"Target Entry: {s['suggested_entry']} | SL: {s['stop_loss']} | TP: {s['take_profit']}\n"
             
-    llm = ChatOpenAI(model="gpt-4o", temperature=0) # use a slightly smarter model for the final decision
+    llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", temperature=0)
     structured_llm = llm.with_structured_output(DecisionOutput)
     
     prompt = ChatPromptTemplate.from_messages([
-        ("system", "You are the Chief Investment Officer AI. You receive briefings from Technical, Sentiment, Order Flow, and Risk agents. Synthesize their signals, weighting high-confidence technicals and order flows heavily. If there is a strong consensus, output a BUY or SELL with consensus price targets. If they severely disagree, output NO TRADE. Provide an aggregated score (-1.0 to 1.0)."),
+        ("system", SKILL_CONTENT + "\n\nSynthesize the agent reports below. Weight high-confidence technicals and order flows heavily. If there is a strong consensus, output a BUY or SELL with consensus price targets. If they severely disagree, output NO TRADE."),
         ("human", "Asset: {symbol}\n\nAgent Reports:\n{reports}")
     ])
     

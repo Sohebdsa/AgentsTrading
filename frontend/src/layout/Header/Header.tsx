@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import NavItems from './NavItems';
 import './Header.css';
 
@@ -10,12 +11,12 @@ const Header = () => {
             <div className="cxa-header-inner">
 
                 {/* Logo */}
-                <a href="/" className="cxa-logo" aria-label="CubeXAgents home">
+                <Link to="/" className="cxa-logo" aria-label="CubeXAgents home">
                     <span className="cxa-logo-cube" aria-hidden="true">⬡</span>
                     <span className="cxa-logo-text">
                         Cube<span className="cxa-logo-accent">X</span>Agents
                     </span>
-                </a>
+                </Link>
 
                 {/* Desktop nav */}
                 <nav className="cxa-nav" aria-label="Main navigation">
