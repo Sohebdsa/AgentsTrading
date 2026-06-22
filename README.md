@@ -106,5 +106,5 @@ npm run dev
 ---
 
 <p align="center">
-  Built by V3nom with ❤️ for algorithmic traders and AI enthusiasts.
+  Built by V3nom with ❤️  for algorithmic traders and AI enthusiasts.
 </p>
