@@ -20,7 +20,6 @@ The system is fully observable through a professional, Bloomberg-terminal-inspir
 ![CubeXAgents Dashboard Demo](./doc_assets/Dashboard.png)
 *(Screenshot: Main Dashboard showcasing live AI agent decisions and market charts)*
 
-
 ## ✨ Architecture & Features
 
 ### The Multi-Agent Swarm (LangGraph + OpenAI)
