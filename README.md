@@ -50,6 +50,7 @@ The pipeline natively supports a Human-in-the-loop (HITL) architecture. The exec
 - Python 3.10+
 - A valid OpenAI API Key
 
+-
 ### 1. Backend Setup
 
 ```bash
