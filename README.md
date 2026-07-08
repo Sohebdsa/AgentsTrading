@@ -36,7 +36,7 @@ The pipeline natively supports a Human-in-the-loop (HITL) architecture. The exec
 *(Screenshot: The Agents Workspace showing real-time agent processing and the human approval modal)*
 
 ### Technical Stack
-- **Backend Core**: Python 3.10+, FastAPI, Uvicorn
+- **Backend Core**: Python 3.10+, FastAPI, Uvicorn   
 - **AI Agent Orchestration**: LangChain, LangGraph, OpenAI (`gpt-4o-mini`)
 - **Real-Time Data**: CCXT (Binance integration), WebSocket streams
 - **Frontend Core**: React 18, Vite, TypeScript
