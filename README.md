@@ -8,7 +8,6 @@
     A sophisticated algorithmic trading platform powered by LLM agent swarms, LangGraph, FastAPI, and React.
   </p>
 </div>
-
 ---
 
 ## ⚡ Overview
