@@ -5,7 +5,7 @@
     <strong>Autonomous, Multi-Agent AI Trading System</strong>
   </p>
   <p align="center">
-    A sophisticated algorithmic trading platform powered by LLM agent swarms, LangGraph, FastAPI, and React.
+    A sophisticated algorithmic trading platform powered by LLM agent swarms, LangGraph, FastAPI, and React.. 
   </p>
 </div>
 ---
