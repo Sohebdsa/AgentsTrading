@@ -14,7 +14,7 @@
 
 CubeXAgents is a state-of-the-art autonomous trading system built on a multi-agent architecture. Instead of relying entirely on static code heuristics, the platform uses an interconnected network of specialized Large Language Model (LLM) agents (Technical Analysis, Sentiment Analysis, Order Flow, and Risk Management). These agents process live market data in parallel and pass their independent findings to a master Decision Aggregation agent.
 
-The system is fully observable through a professional, Bloomberg-terminal-inspired React dashboard, allowing users to watch agents debate, vote, and execute live or paper trades in real-time.
+The system is fully observable through a professional, Bloomberg-terminal-inspired React dashboard, allowing users to watch agents debate, vote, and execute live or paper trades in real-time.. 
 
 ![CubeXAgents Dashboard Demo](./doc_assets/Dashboard.png)
 *(Screenshot: Main Dashboard showcasing live AI agent decisions and market charts)*
